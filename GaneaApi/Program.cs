@@ -1,36 +1,50 @@
-var builder = WebApplication.CreateBuilder(args);
+﻿using Infrastructure.Persistance;
+using Microsoft.EntityFrameworkCore;
 
-// Add services to the container.
+namespace GaneaApi;
 
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+public class Program
 {
-    app.MapOpenApi();
+    public static async Task Main(string[] args)
+    {
+
+        var builder = WebApplication.CreateBuilder(args);
+        var configuration = builder.Configuration;
+        var services = builder.Services;
+        // Add services to the container.
+
+        builder.Services.AddControllers();
+
+
+        services.AddDbContext<GaneaDbContext>(opt =>
+        opt.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
+
+        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+        builder.Services.AddOpenApi();
+
+        var app = builder.Build();
+
+        // Configure the HTTP request pipeline.
+        if (app.Environment.IsDevelopment())
+        {
+            IServiceScope scope = services.BuildServiceProvider()
+                .CreateScope()!;
+
+            GaneaDbContext context = scope.ServiceProvider
+                .GetRequiredService<GaneaDbContext>();
+
+            await GaneaDbContextSeed.SeedDevelopmentDataAsync(context);
+
+            app.MapOpenApi();
+        }
+
+        app.UseHttpsRedirection();
+
+        app.UseAuthorization();
+
+        app.MapControllers();
+
+        app.Run();
+    }
 }
-//using (var scope = app.Services.CreateScope())
-//{
-//	var services = scope.ServiceProvider;
-//	try
-//	{
-//		var context = services.GetRequiredService();
-
-//	}
-//	catch (Exception ex)
-//	{
-
-//		throw;
-//	}
-//}
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();

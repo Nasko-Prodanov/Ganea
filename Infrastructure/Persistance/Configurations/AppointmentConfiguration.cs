@@ -23,6 +23,8 @@ namespace Infrastructure.Persistance.Configurations
             builder.HasOne(apt => apt.Employee)
                 .WithMany(c => c.Appointments)
                 .HasForeignKey(c => c.EmployeeId);
+
+
         }
     }
 }

@@ -20,6 +20,7 @@ namespace Infrastructure.Persistance
         public DbSet<ProcedureCategory> ProcedureCategories { get; set; } = null!;
         public DbSet<AppointmentProcedure> AppointmentProcedures { get; set; } = null!;
         public GaneaDbContext(DbContextOptions<GaneaDbContext> options)
+            : base(options)
         {
         }
 

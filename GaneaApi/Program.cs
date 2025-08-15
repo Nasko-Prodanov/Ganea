@@ -1,4 +1,5 @@
-﻿using Infrastructure.Persistance;
+﻿using Infrastructure.Extensions;
+using Infrastructure.Persistance;
 using Microsoft.EntityFrameworkCore;
 
 namespace GaneaApi;
@@ -13,12 +14,8 @@ public class Program
         var services = builder.Services;
         // Add services to the container.
 
+        builder.Services.AddInfrstructure(configuration);
         builder.Services.AddControllers();
-
-
-        services.AddDbContext<GaneaDbContext>(opt =>
-        opt.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
-
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();

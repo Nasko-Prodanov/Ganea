@@ -304,7 +304,8 @@ public static class GaneaDbContextSeed
     {
         if (isDevelopment)
         {
-            SeedDevelopmentDataAsync(context);
+            // Await the asynchronous method to ensure proper execution order  
+            SeedDevelopmentDataAsync(context).GetAwaiter().GetResult();
         }
         else
         {

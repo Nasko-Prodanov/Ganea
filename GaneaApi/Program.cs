@@ -1,4 +1,5 @@
-﻿using Infrastructure.Extensions;
+﻿using Application.Common.Extension;
+using Infrastructure.Extensions;
 using Infrastructure.Persistance;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,7 +16,10 @@ public class Program
         // Add services to the container.
 
         builder.Services.AddInfrstructure(configuration);
+        builder.Services.AddApplication();
         builder.Services.AddControllers();
+
+        builder.Services.AddSwaggerGen();
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
@@ -25,16 +29,23 @@ public class Program
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
-            IServiceScope scope = services.BuildServiceProvider()
-                .CreateScope()!;
-
-            GaneaDbContext context = scope.ServiceProvider
-                .GetRequiredService<GaneaDbContext>();
-
-            await GaneaDbContextSeed.SeedDevelopmentDataAsync(context);
+            using (var scope = app.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<GaneaDbContext>();
+                await GaneaDbContextSeed.SeedDevelopmentDataAsync(context);
+            }
 
             app.MapOpenApi();
         }
+
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ganea API V1");
+            c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
+        });
+
+        app.MapGet("/", () => "Welcome to Ganea API!");
 
         app.UseHttpsRedirection();
 

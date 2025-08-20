@@ -9,7 +9,7 @@ namespace Application.Common.Interfaces
 
         Task<int> CreateProcedureAsync(ProcedureDto procedureDto, CancellationToken cancellationToken);
 
-        Task UpdateProcedureAsync(int id, ProcedureDto procedureDto, CancellationToken cancellationToken);
+        Task<ProcedureDto> UpdateProcedureAsync(int id, ProcedureDto procedureDto, CancellationToken cancellationToken);
 
         Task DeleteProcedureAsync(int id, CancellationToken cancellationToken);
     }

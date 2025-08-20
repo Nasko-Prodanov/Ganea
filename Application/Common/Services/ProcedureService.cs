@@ -1,5 +1,6 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Models.Procedure;
+using Application.Common.Validators;
 using Infrastructure.Persistance;
 using Infrastructure.Persistance.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -39,10 +40,20 @@ namespace Application.Common.Services
             return result;
         }
 
-        public async Task<ProcedureDto> CreateProcedureAsync(ProcedureDto procedureDto, CancellationToken cancellationToken)
+        public async Task<int> CreateProcedureAsync(ProcedureDto procedureDto, CancellationToken cancellationToken)
         {
+            ProcedureValidator.ProcedureNameEmptyValidator(procedureDto.ProcedureName);
+
+            ProcedureValidator.ProcedureDurationValidator(procedureDto.Duration);
+
+            ProcedureValidator.ProcedurePriceValidator(procedureDto.Price);
+
+            ProcedureValidator.ProcedureCategoryIdValidator(procedureDto.ProcedureCategoryId);
+
+            await ProcedureValidator.ProcedureDuplicateNameValidator(procedureDto.ProcedureName, context);
+
             var procedure = context.Procedures
-                .Add(new Infrastructure.Persistance.Entities.Procedure
+                .Add(new Procedure
                 {
                     ProcedureName = procedureDto.ProcedureName,
                     Duration = procedureDto.Duration,
@@ -51,22 +62,30 @@ namespace Application.Common.Services
                 });
 
             await context.SaveChangesAsync(cancellationToken);
-            
-            return procedureDto;
+
+            return procedureDto.ProcedureId;
         }
         public async Task<ProcedureDto> UpdateProcedureAsync(int id, ProcedureDto procedureDto, CancellationToken cancellationToken)
         {
             var procedure = await context.Procedures
                 .FirstOrDefaultAsync(p => p.ProcedureId == id, cancellationToken);
-            if (procedure == null)
-            {
-                throw new KeyNotFoundException($"Procedure with ID {id} not found.");
-            }
+
+            ProcedureValidator.ProcedureIdValidator(procedure.ProcedureId);
 
             procedure.ProcedureName = procedureDto.ProcedureName;
             procedure.Duration = procedureDto.Duration;
             procedure.Price = procedureDto.Price;
             procedure.ProcedureCategoryId = procedureDto.ProcedureCategoryId;
+
+            ProcedureValidator.ProcedureNameEmptyValidator(procedure.ProcedureName);
+
+            ProcedureValidator.ProcedureDurationValidator(procedure.Duration);
+
+            ProcedureValidator.ProcedurePriceValidator(procedure.Price);
+
+            ProcedureValidator.ProcedureCategoryIdValidator(procedure.ProcedureCategoryId);
+
+            await ProcedureValidator.ProcedureDuplicateNameValidator(procedure.ProcedureName, context);
 
             await context.SaveChangesAsync(cancellationToken);
 
@@ -77,25 +96,13 @@ namespace Application.Common.Services
         {
             var procedure = await context.Procedures
                 .FirstOrDefaultAsync(p => p.ProcedureId == id, cancellationToken);
-            if (procedure == null)
-            {
-                throw new KeyNotFoundException($"Procedure with ID {id} not found.");
-            }
+
+            ProcedureValidator.ProcedureIdValidator(procedure.ProcedureId);
 
             context.Procedures.Remove(procedure);
-            
+
             await context.SaveChangesAsync(cancellationToken);
 
-        }
-
-        Task<int> IProcedureService.CreateProcedureAsync(ProcedureDto procedureDto, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task IProcedureService.UpdateProcedureAsync(int id, ProcedureDto procedureDto, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
         }
     }
 }

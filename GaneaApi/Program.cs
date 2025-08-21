@@ -26,17 +26,27 @@ public class Program
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
-        if (app.Environment.IsDevelopment())
+        try
         {
-            using (var scope = app.Services.CreateScope())
-            {
-                var context = scope.ServiceProvider.GetRequiredService<GaneaDbContext>();
-                await GaneaDbContextSeed.SeedDevelopmentDataAsync(context);
-            }
+            using var scope = app.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<GaneaDbContext>();
 
-            app.MapOpenApi();
+            await context.Database.MigrateAsync();
+
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
+            {
+                await GaneaDbContextSeed.SeedDevelopmentDataAsync(context);
+
+                app.MapOpenApi();
+            }
         }
+        catch (Exception)
+        {
+            //TODO: Log the exception
+            throw;
+        }
+
 
         app.UseSwagger();
         app.UseSwaggerUI(c =>

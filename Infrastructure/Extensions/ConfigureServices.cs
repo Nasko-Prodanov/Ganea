@@ -34,8 +34,7 @@ namespace Infrastructure.Extensions
                 options.Password.RequiredLength = 8;
             })
                 .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<GaneaDbContext>()
-                .AddDefaultTokenProviders();
+                .AddEntityFrameworkStores<GaneaDbContext>();
         }
     }
 }

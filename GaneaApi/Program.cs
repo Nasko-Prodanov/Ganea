@@ -42,10 +42,7 @@ public class Program
         app.UseSwaggerUI(c =>
         {
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ganea API V1");
-            c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
         });
-
-        app.MapGet("/", () => "Welcome to Ganea API!");
 
         app.UseHttpsRedirection();
 

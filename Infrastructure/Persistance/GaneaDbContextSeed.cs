@@ -295,22 +295,8 @@ public static class GaneaDbContextSeed
         }
     }
 
-    public static void SeedProductionData(GaneaDbContext context)
-    {
+    //public static void SeedProductionData(GaneaDbContext context)
+    //{
 
-    }
-
-    public static void SeedData(GaneaDbContext context, bool isDevelopment)
-    {
-        if (isDevelopment)
-        {
-            // Await the asynchronous method to ensure proper execution order  
-            SeedDevelopmentDataAsync(context).GetAwaiter().GetResult();
-        }
-        else
-        {
-            SeedProductionData(context);
-        }
-        context.SaveChanges();
-    }
+    //}
 }

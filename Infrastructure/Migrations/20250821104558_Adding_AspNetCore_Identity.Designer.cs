@@ -4,6 +4,7 @@ using Infrastructure.Persistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GaneaDbContext))]
-    partial class GaneaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250821104558_Adding_AspNetCore_Identity")]
+    partial class Adding_AspNetCore_Identity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -99,11 +102,11 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Infrastructure.Persistance.Entities.Employee", b =>
                 {
-                    b.Property<int>("EmployeeId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -115,14 +118,7 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("EmployeeId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasKey("Id");
 
                     b.ToTable("Employees");
                 });
@@ -411,17 +407,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("Procedure");
                 });
 
-            modelBuilder.Entity("Infrastructure.Persistance.Entities.Employee", b =>
-                {
-                    b.HasOne("Infrastructure.Persistance.Entities.User", "User")
-                        .WithOne("Employee")
-                        .HasForeignKey("Infrastructure.Persistance.Entities.Employee", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Infrastructure.Persistance.Entities.Procedure", b =>
                 {
                     b.HasOne("Infrastructure.Persistance.Entities.ProcedureCategory", "ProcedureCategory")
@@ -505,12 +490,6 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Infrastructure.Persistance.Entities.ProcedureCategory", b =>
                 {
                     b.Navigation("Procedures");
-                });
-
-            modelBuilder.Entity("Infrastructure.Persistance.Entities.User", b =>
-                {
-                    b.Navigation("Employee")
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

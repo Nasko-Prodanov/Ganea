@@ -1,9 +1,12 @@
-﻿using Infrastructure.Persistance;
+﻿using System.Text;
+using Infrastructure.Persistance;
 using Infrastructure.Persistance.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure.Extensions
 {
@@ -14,6 +17,7 @@ namespace Infrastructure.Extensions
             services.AddDbContext();
 
             services.AddIdentity();
+            services.AddTokenBasedAuthentication();
         }
 
         public static void AddDbContext(this IServiceCollection services)
@@ -35,6 +39,25 @@ namespace Infrastructure.Extensions
             })
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<GaneaDbContext>();
+        }
+
+        public static void AddTokenBasedAuthentication(this IServiceCollection services)
+        {
+            string? key = Environment.GetEnvironmentVariable("JWT_SECURITY_KEY");
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                    };
+                });
         }
     }
 }

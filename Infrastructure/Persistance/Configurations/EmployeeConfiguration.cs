@@ -13,7 +13,7 @@ namespace Infrastructure.Persistance.Configurations
     {
         public void Configure(EntityTypeBuilder<Employee> builder)
         {
-            builder.HasKey(ei => ei.Id);
+            builder.HasKey(ei => ei.EmployeeId);
             
             builder.Property(ei => ei.FirstName)
                 .HasMaxLength(20)
@@ -22,6 +22,11 @@ namespace Infrastructure.Persistance.Configurations
             builder.Property(ei => ei.LastName)
                 .HasMaxLength(20)
                 .IsRequired();
+
+            builder.HasOne(ei => ei.User)
+                .WithOne(u => u.Employee)
+                .HasForeignKey<Employee>(ei => ei.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

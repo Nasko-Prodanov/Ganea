@@ -2,16 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Infrastructure.Persistance.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Client;
 
 namespace Infrastructure.Persistance
 {
-    public class GaneaDbContext : DbContext
+    public class GaneaDbContext : IdentityDbContext<User>
     {
         public DbSet<Appointment> Appointments { get; set; } = null!;
         public DbSet<Client> Clients { get; set; } = null!;
@@ -19,8 +21,9 @@ namespace Infrastructure.Persistance
         public DbSet<Procedure> Procedures { get; set; } = null!;
         public DbSet<ProcedureCategory> ProcedureCategories { get; set; } = null!;
         public DbSet<AppointmentProcedure> AppointmentProcedures { get; set; } = null!;
+
         public GaneaDbContext(DbContextOptions<GaneaDbContext> options)
-            : base(options)
+           : base(options)
         {
         }
 

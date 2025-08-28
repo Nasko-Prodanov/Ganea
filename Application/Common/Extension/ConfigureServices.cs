@@ -8,10 +8,10 @@ namespace Application.Common.Extension
     {
         public static void AddApplication(this IServiceCollection services)
         {
-
+            services.AddScoped<IIdentityService, IdentityService>();
+            services.AddScoped<IdentityService>();
             services.AddScoped<IProcedureCategoriesService, ProcedureCategoriesService>();
             services.AddScoped<IProcedureService, ProcedureService>();
-
         }
     }
 }

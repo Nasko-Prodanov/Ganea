@@ -9,7 +9,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "DB_CONNECTION": "Server=localhost;Database=Ganea;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true",
-        "JWT_SECURITY_KEY": "ZDMwNzEzO#QtMDhhNi00*&WWJjODY_023!@GY0M#$YwNWM4ZDlm"
+        "JWT_SECURITY_KEY": "ZDMwNzEzO#QtMDhhNi00*&WWJjODY_023!@GY0M#$YwNWM4ZDlm",
+        "DEFAULT_PASSWORD": "Parola123"
       }
     },
     "https": {
@@ -20,7 +21,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "DB_CONNECTION": "Server=localhost;Database=Ganea;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true",
-        "JWT_SECURITY_KEY": "ZDMwNzEzO#QtMDhhNi00*&WWJjODY_023!@GY0M#$YwNWM4ZDlm"
+        "JWT_SECURITY_KEY": "ZDMwNzEzO#QtMDhhNi00*&WWJjODY_023!@GY0M#$YwNWM4ZDlm",
+        "DEFAULT_PASSWORD": "Parola123"
       }
     }
   }

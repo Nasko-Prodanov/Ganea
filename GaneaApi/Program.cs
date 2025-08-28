@@ -15,10 +15,12 @@ public class Program
         var services = builder.Services;
         // Add services to the container.
 
+        //builder.Services.AddScoped<IdentityService>();
+
         builder.Services.AddInfrstructure(configuration);
         builder.Services.AddApplication();
         builder.Services.AddControllers();
-
+        builder.Services.AddIdentity();
         builder.Services.AddSwaggerGen();
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -46,7 +48,6 @@ public class Program
             //TODO: Log the exception
             throw;
         }
-
 
         app.UseSwagger();
         app.UseSwaggerUI(c =>

@@ -1,12 +1,38 @@
-﻿namespace Application.Common.Validators
+﻿using System.Text.RegularExpressions;
+
+
+namespace Application.Common.Validators
 {
     public static class UserValidator
     {
+        public const string EmailRegexStrict =
+                     @"^(?=.{1,254}$)(?=.{1,64}@)(?!\.)(?!.*\.\.)[A-Za-z0-9._%+\-]+(?<!\.)@" +
+        @"(?:[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,63}$";
+
+        private static readonly Regex EmailRegex = new(EmailRegexStrict, RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+
+
+        public static void EmailRegexValidator(string? email)
+        {
+            if (!EmailRegex.IsMatch(email))
+            {
+                throw new ArgumentException("Invalid email format.", nameof(email));
+            }
+        }
+
         public static void UserEmailValidator(string? email)
         {
             if (string.IsNullOrWhiteSpace(email))
             {
                 throw new ArgumentException("Email cannot be empty.", nameof(email));
+            }
+        }
+
+        public static void EmailDuplicateValidator(string? email, bool exist)
+        {
+            if (exist != false)
+            {
+                throw new ArgumentException("This email was already registered.");
             }
         }
 

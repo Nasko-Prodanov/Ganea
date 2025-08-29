@@ -1,6 +1,7 @@
 ﻿using Application.Common.Extension;
 using Infrastructure.Extensions;
 using Infrastructure.Persistance;
+using Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
 
 namespace GaneaApi;
@@ -16,6 +17,8 @@ public class Program
         // Add services to the container.
 
         //builder.Services.AddScoped<IdentityService>();
+
+        builder.Services.AddOptions<JwtSettings>();
 
         builder.Services.AddInfrstructure(configuration);
         builder.Services.AddApplication();

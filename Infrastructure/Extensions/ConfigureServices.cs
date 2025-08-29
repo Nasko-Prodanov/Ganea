@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Infrastructure.Persistance;
 using Infrastructure.Persistance.Entities;
+using Infrastructure.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,8 @@ namespace Infrastructure.Extensions
 
             services.AddIdentity();
             services.AddTokenBasedAuthentication();
+
+            services.Configure<JwtSettings>(configuration.GetSection("Authentication:Jwt"));
         }
 
         public static void AddDbContext(this IServiceCollection services)
@@ -55,7 +58,7 @@ namespace Infrastructure.Extensions
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
-                        ValidateAudience = true, 
+                        ValidateAudience = true,
                         ValidateLifetime = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
                     };

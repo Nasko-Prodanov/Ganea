@@ -1,4 +1,5 @@
-﻿using Application.Common.Services;
+﻿using Application.Common.Models.User;
+using Application.Common.Services;
 using Infrastructure.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,6 +32,14 @@ namespace GaneaApi.Controllers
             }
 
             return Created();
+        }
+
+        [HttpPost("Login")]
+        public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginInputModel model, CancellationToken token)
+        {
+            AuthResponse response = await identity.AuthenticateAsync(model, token);
+
+            return response;
         }
     }
 }

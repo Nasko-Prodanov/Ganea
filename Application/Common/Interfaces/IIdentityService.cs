@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.Common.Models.User;
 using Infrastructure.Common.Models;
 
 namespace Application.Common.Interfaces
@@ -10,5 +6,6 @@ namespace Application.Common.Interfaces
     public interface IIdentityService
     {
         Task CreateUserAsync(UserModel model, CancellationToken cancellationToken);
+        Task<AuthResponse> AuthenticateAsync(LoginInputModel model, CancellationToken cancellationToken);
     }
 }

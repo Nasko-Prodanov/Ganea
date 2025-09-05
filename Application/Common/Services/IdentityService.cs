@@ -40,7 +40,7 @@ namespace Application.Common.Services
             UserValidator.EmailRegexValidator(model.Email);
             UserValidator.UserFirstNameValidator(model.FirstName);
             UserValidator.UserLastNameValidator(model.LastName);
-
+            UserValidator.UserNameDuplicateValidator(model.UserName, context.Users.Any(u => u.UserName == model.UserName));
             await context.SaveChangesAsync();
 
             string? password = Environment.GetEnvironmentVariable("DEFAULT_PASSWORD");
@@ -118,9 +118,14 @@ namespace Application.Common.Services
 
             SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+            string issuer = Environment.GetEnvironmentVariable("JWT_ISSUER")!;
+            string audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")!;
+
             JwtSecurityToken tokenOptions = new(
                 claims: claims,
                 expires: DateTime.Now.AddMinutes(settings.AccessTokenExpiration),
+                issuer: issuer,
+                audience: audience,
                 signingCredentials: credentials);
 
             string accessToken = new JwtSecurityTokenHandler()

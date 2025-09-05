@@ -1,16 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Infrastructure.Persistance.Entities;
-using Microsoft.AspNetCore.Identity;
+﻿using Infrastructure.Persistance.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Identity.Client;
 
 namespace Infrastructure.Persistance
 {
@@ -39,7 +29,7 @@ namespace Infrastructure.Persistance
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
+       {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(GaneaDbContext).Assembly);
             base.OnModelCreating(modelBuilder);
         }

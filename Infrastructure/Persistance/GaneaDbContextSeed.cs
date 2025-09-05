@@ -1,10 +1,31 @@
 ﻿using System;
+using System.Security.Cryptography.Pkcs;
 using Infrastructure.Persistance.Entities;
+using Infrastructure.Persistance.Enums;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 namespace Infrastructure.Persistance;
 
 public static class GaneaDbContextSeed
 {
+    public async static Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
+    {
+        //Getting all the roles from the enum
+        IEnumerable<string> roles = Enum.GetNames(typeof(Role));
+
+        foreach (string r in roles)
+        {
+            bool isExistingRole = await roleManager.RoleExistsAsync(r);
+
+            if (!isExistingRole)
+            {
+                //If result is unsuccessful, log it after integrating logging
+                IdentityResult result = await roleManager.CreateAsync(new IdentityRole(r));
+            }
+        }
+    }
+
     public static async Task SeedDevelopmentDataAsync(GaneaDbContext context)
     {
         bool hasData = await context.ProcedureCategories
@@ -292,6 +313,46 @@ public static class GaneaDbContextSeed
             );
 
             await context.SaveChangesAsync();
+        }
+    }
+
+    public static async Task SeedDefaultAccount(
+        IConfiguration configuration,
+        UserManager<User> userManager,
+        RoleManager<IdentityRole> roleManager)
+    {
+        bool emptyUserTable = !await userManager.Users
+            .AnyAsync();
+
+        bool notExistingAdmin = await userManager.Users
+            .AnyAsync(u => u.Role.HasValue && u.Role == Role.Admin);
+
+        if (emptyUserTable || notExistingAdmin)
+        {
+            string userName = configuration["DefaultUser:UserName"]!;
+            string email = configuration["DefaultUser:Email"]!;
+            string password = configuration["DefaultUser:Password"]!;
+
+            User admin = new User
+            {
+                UserName = userName,
+                Email = email
+            };
+
+            IdentityResult createUserResult = await userManager.CreateAsync(admin, password);
+
+            if (!createUserResult.Succeeded)
+            {
+                //TODO: Log this
+                throw new Exception($"Failed to create default user. Errors: {string.Join(", ", createUserResult.Errors)}");
+            }
+
+            IdentityResult addToRoleResult = await userManager.AddToRoleAsync(admin, Role.Admin.ToString());
+
+            if (!addToRoleResult.Succeeded)
+            {
+                throw new InvalidOperationException($"Failed to add default user to role. Errors: {string.Join(", ", addToRoleResult.Errors)}");
+            }
         }
     }
 

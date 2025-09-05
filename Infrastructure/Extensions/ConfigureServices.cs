@@ -59,6 +59,7 @@ namespace Infrastructure.Extensions
                     {
                         ValidateIssuerSigningKey = true,
                         ValidateAudience = true,
+                        ValidateIssuer = true,
                         ValidateLifetime = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
                     };

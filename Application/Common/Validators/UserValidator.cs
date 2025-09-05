@@ -44,6 +44,14 @@ namespace Application.Common.Validators
             }
         }
 
+        public static void UserNameDuplicateValidator(string userName,bool exist)
+        {
+            if (exist != false)
+            {
+                throw new ArgumentException("This user name was already registered.");
+            }
+        }
+
         public static void UserFirstNameValidator(string? firstName)
         {
             if (string.IsNullOrWhiteSpace(firstName))

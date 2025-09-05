@@ -9,9 +9,6 @@ namespace Infrastructure.Common.Models
 {
     public class UserModel
     {
-        
-        [Required(ErrorMessage = "Email is required.")]
-        [StringLength(255, ErrorMessage = "Email is too long.")]
         [EmailAddress]
         public string Email { get; set; } = null!;
 

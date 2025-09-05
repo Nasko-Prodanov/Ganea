@@ -5,8 +5,6 @@ namespace Application.Common.Validators
 {
     public class ProcedureValidator
     {
-
-
         public static void ProcedureNameEmptyValidator(string? procedureName)
         {
             if (string.IsNullOrWhiteSpace(procedureName))

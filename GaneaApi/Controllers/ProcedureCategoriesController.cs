@@ -1,5 +1,6 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Models.ProcedureCategories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GaneaApi.Controllers
@@ -14,6 +15,7 @@ namespace GaneaApi.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<List<ProcedureCategoryDto>>> GetCategories([FromQuery] string? search, CancellationToken cancellationToken)
         {
             return await procedureCategoriesService.GetProcedureCategoriesAsync(search, CancellationToken);

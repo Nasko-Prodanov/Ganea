@@ -33,7 +33,7 @@ namespace Infrastructure.Extensions
         {
             services.AddIdentityCore<User>(options =>
             {
-                options.SignIn.RequireConfirmedAccount = true;
+                options.User.RequireUniqueEmail = true;
                 options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
@@ -41,13 +41,12 @@ namespace Infrastructure.Extensions
                 options.Password.RequiredLength = 8;
             })
                 .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<GaneaDbContext>();
+                .AddEntityFrameworkStores<GaneaDbContext>()
+                .AddDefaultTokenProviders();
         }
 
         public static void AddTokenBasedAuthentication(this IServiceCollection services)
         {
-            string? key = Environment.GetEnvironmentVariable("JWT_SECURITY_KEY");
-
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -55,13 +54,18 @@ namespace Infrastructure.Extensions
             })
                 .AddJwtBearer(options =>
                 {
+                    options.MapInboundClaims = false;
+
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
                         ValidateAudience = true,
                         ValidateIssuer = true,
                         ValidateLifetime = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                        ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+                        ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECURITY_KEY")!))
                     };
                 });
         }

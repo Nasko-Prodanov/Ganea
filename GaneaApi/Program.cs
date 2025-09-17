@@ -65,7 +65,6 @@ public class Program
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
-        builder.Services.AddScoped<RoleService>();
         var app = builder.Build();
 
         try
@@ -104,8 +103,8 @@ public class Program
 
         app.UseHttpsRedirection();
 
-        app.UseAuthorization();
         app.UseAuthentication();
+        app.UseAuthorization();
         app.MapControllers();
 
         app.MapGet("/", () => Results.Redirect("/swagger"));

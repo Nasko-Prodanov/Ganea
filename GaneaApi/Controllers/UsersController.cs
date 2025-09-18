@@ -1,17 +1,23 @@
-﻿using Application.Common.Models.User;
+﻿using Application.Common.Interfaces;
+using Application.Common.Models.ChangePassword;
+using Application.Common.Models.User;
 using Application.Common.Services;
 using Infrastructure.Common.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GaneaApi.Controllers
 {
     public class UsersController : BaseController
     {
-        private readonly IdentityService identity;
+        private readonly IIdentityService identityService;
+        private readonly ICurrentUserService currentUserService;
 
-        public UsersController(IdentityService identity)
+        public UsersController(IdentityService identity,ICurrentUserService currentUserService)
         {
-            this.identity = identity;
+            this.identityService = identity;
+            this.currentUserService = currentUserService;
         }
 
         [HttpPost("Register")]
@@ -24,7 +30,7 @@ namespace GaneaApi.Controllers
 
             try
             {
-                await identity.CreateUserAsync(user, cancellationToken);
+                await identityService.CreateUserAsync(user, cancellationToken);
             }
             catch (Exception)
             {
@@ -37,9 +43,36 @@ namespace GaneaApi.Controllers
         [HttpPost("Login")]
         public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginInputModel model, CancellationToken token)
         {
-            AuthResponse response = await identity.AuthenticateAsync(model, token);
+            AuthResponse response = await identityService.AuthenticateAsync(model, token);
 
             return response;
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("ResetPassword")]
+        public async Task<IActionResult> ResetPassword([FromBody] ChangePasswordDto model, string userId)
+        {
+            IdentityResult result = await identityService.ResetPasswordAsync(userId, model.NewPassword);
+            
+            if (!result.Succeeded)
+            {
+                return BadRequest(string.Join(", ", result.Errors));
+            }
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpPut("ChangePassword")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto model)
+        {
+            IdentityResult result = await identityService.ChangeCurrentUserPasswordAsync(currentUserService.UserId , model.OldPassword, model.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(string.Join(", ", result.Errors));
+            }
+
+            return Ok(result);
         }
     }
 }

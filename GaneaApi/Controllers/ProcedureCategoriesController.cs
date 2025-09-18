@@ -8,16 +8,19 @@ namespace GaneaApi.Controllers
     public class ProcedureCategoriesController : BaseController
     {
         private readonly IProcedureCategoriesService procedureCategoriesService;
+        private readonly ICurrentUserService currentUserService;
 
-        public ProcedureCategoriesController(IProcedureCategoriesService procedureCategoriesService)
+        public ProcedureCategoriesController(IProcedureCategoriesService procedureCategoriesService, ICurrentUserService currentUserService)
         {
             this.procedureCategoriesService = procedureCategoriesService;
+            this.currentUserService = currentUserService;
         }
 
         [HttpGet]
         [Authorize]
         public async Task<ActionResult<List<ProcedureCategoryDto>>> GetCategories([FromQuery] string? search, CancellationToken cancellationToken)
         {
+            string userId = currentUserService.UserId;
             return await procedureCategoriesService.GetProcedureCategoriesAsync(search, CancellationToken);
         }
 

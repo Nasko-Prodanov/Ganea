@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security.Claims;
+using System.Text;
 using Infrastructure.Persistance;
 using Infrastructure.Persistance.Entities;
 using Infrastructure.Settings;

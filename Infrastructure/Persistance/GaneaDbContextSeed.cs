@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using System.Security.Cryptography.Pkcs;
 using Infrastructure.Persistance.Entities;
 using Infrastructure.Persistance.Enums;
@@ -324,10 +325,10 @@ public static class GaneaDbContextSeed
         bool emptyUserTable = !await userManager.Users
             .AnyAsync();
 
-        bool notExistingAdmin = await userManager.Users
+        bool existingAdmin = await userManager.Users
             .AnyAsync(u => u.Role.HasValue && u.Role == Role.Admin);
 
-        if (emptyUserTable || notExistingAdmin)
+        if (emptyUserTable || !existingAdmin)
         {
             string userName = configuration["DefaultUser:UserName"]!;
             string email = configuration["DefaultUser:Email"]!;
@@ -340,6 +341,15 @@ public static class GaneaDbContextSeed
             };
 
             IdentityResult createUserResult = await userManager.CreateAsync(admin, password);
+
+            List<Claim> claims = new()
+            {
+                new Claim(ClaimTypes.NameIdentifier, admin.Id),
+                new Claim(ClaimTypes.Email, admin.Email),
+                new Claim(ClaimTypes.Role, Role.Admin.ToString())
+            };
+
+            await userManager.AddClaimsAsync(admin, claims);
 
             if (!createUserResult.Succeeded)
             {

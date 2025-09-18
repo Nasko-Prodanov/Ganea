@@ -1,5 +1,4 @@
-﻿using System;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -11,7 +10,6 @@ using Infrastructure.Persistance;
 using Infrastructure.Persistance.Entities;
 using Infrastructure.Settings;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -41,7 +39,6 @@ namespace Application.Common.Services
             UserValidator.UserFirstNameValidator(model.FirstName);
             UserValidator.UserLastNameValidator(model.LastName);
             UserValidator.UserNameDuplicateValidator(model.UserName, context.Users.Any(u => u.UserName == model.UserName));
-            await context.SaveChangesAsync();
 
             string? password = Environment.GetEnvironmentVariable("DEFAULT_PASSWORD");
 
@@ -58,6 +55,15 @@ namespace Application.Common.Services
             };
 
             IdentityResult result = await userManager.CreateAsync(user, password);
+
+            List<Claim> claims = new()
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Email, user.Email)
+            };
+
+            await userManager.AddClaimsAsync(user, claims);
 
             if (!result.Succeeded)
             {
@@ -111,7 +117,7 @@ namespace Application.Common.Services
                 RefreshToken = refreshToken
             };
         }
-
+ 
         private string GenerateAccessToken(User user, IEnumerable<Claim> claims, CancellationToken token)
         {
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
@@ -123,7 +129,7 @@ namespace Application.Common.Services
 
             JwtSecurityToken tokenOptions = new(
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(settings.AccessTokenExpiration),
+                expires: DateTime.Now.AddMinutes(15),
                 issuer: issuer,
                 audience: audience,
                 signingCredentials: credentials);
@@ -152,6 +158,41 @@ namespace Application.Common.Services
             await userManager.UpdateAsync(user);
 
             return refreshToken;
+        }
+
+        public async Task<IdentityResult> ChangeCurrentUserPasswordAsync(string userId, string oldPassword, string newPassword)
+        {
+            PasswordValidator.PasswordEmptyValidator(newPassword);
+            PasswordValidator.PasswordLengthValidator(newPassword);
+            PasswordValidator.PasswordMaxLengthValidator(newPassword);
+
+            User? user = await userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "User not found." });
+            }
+
+            IdentityResult result = await userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+
+            return result;
+        }
+
+        public async Task<IdentityResult> ResetPasswordAsync(string userId, string newPassword)
+        {
+            User? user = await userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "User not found." });
+            }
+
+            string token = await userManager.GeneratePasswordResetTokenAsync(user);
+
+
+            IdentityResult result = await userManager.ResetPasswordAsync(user, token, newPassword);
+
+            return result;
         }
     }
 }

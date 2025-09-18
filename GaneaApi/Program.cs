@@ -1,5 +1,7 @@
 ﻿using Application.Common.Extension;
+using Application.Common.Interfaces;
 using Application.Common.Services;
+using GaneaApi.Services;
 using Infrastructure.Extensions;
 using Infrastructure.Persistance;
 using Infrastructure.Persistance.Entities;
@@ -28,13 +30,14 @@ public class Program
         })
          .AddRoles<IdentityRole>()                              // много важно за RoleManager
          .AddEntityFrameworkStores<GaneaDbContext>()            // свързва към БД
-         .AddSignInManager();                                   //builder.Services.AddScoped<IdentityService>();
-
+         .AddSignInManager();                                   
+        
+        builder.Services.AddScoped<IdentityService>();
         builder.Services.AddOptions<JwtSettings>();
         builder.Services.AddInfrstructure(configuration);
         builder.Services.AddApplication();
         builder.Services.AddControllers();
-        builder.Services.AddIdentity();
+        //builder.Services.AddIdentity();
         builder.Services.AddOpenApiDocument(configure =>
          {
              configure.Title = "Ganea API";
@@ -56,13 +59,15 @@ public class Program
             .Configure<ApiBehaviorOptions>(options =>
             options.SuppressModelStateInvalidFilter = true); // Customize default API behavior
 
+
         var jwt = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()!;
 
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
-
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
         var app = builder.Build();

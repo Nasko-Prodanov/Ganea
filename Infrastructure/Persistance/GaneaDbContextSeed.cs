@@ -1,6 +1,4 @@
-﻿using System;
-using System.Security.Claims;
-using System.Security.Cryptography.Pkcs;
+﻿using System.Security.Claims;
 using Infrastructure.Persistance.Entities;
 using Infrastructure.Persistance.Enums;
 using Microsoft.AspNetCore.Identity;
@@ -337,7 +335,8 @@ public static class GaneaDbContextSeed
             User admin = new User
             {
                 UserName = userName,
-                Email = email
+                Email = email,
+                Role = Role.Admin
             };
 
             IdentityResult createUserResult = await userManager.CreateAsync(admin, password);
@@ -368,6 +367,6 @@ public static class GaneaDbContextSeed
 
     //public static void SeedProductionData(GaneaDbContext context)
     //{
-
+    //
     //}
 }

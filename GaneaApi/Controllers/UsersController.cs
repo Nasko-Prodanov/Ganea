@@ -87,6 +87,20 @@ namespace GaneaApi.Controllers
             }
             return Ok(result);
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete]
+        public async Task<ActionResult<IdentityResult>> DeleteUser(string userId)
+        {
+            IdentityResult result = await identityService.DeleteUserAsync(userId);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(string.Join(", ", result.Errors));
+            }
+
+            return result;
+        }
     }
 }
 

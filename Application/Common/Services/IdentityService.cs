@@ -24,7 +24,7 @@ namespace Application.Common.Services
         private readonly JwtSettings settings;
         private readonly string jwtKey;
 
-        public IdentityService(UserManager<User> userManager, GaneaDbContext context, IOptions<JwtSettings> options)
+        public IdentityService(UserManager<User> userManager, GaneaDbContext context, IOptions<JwtSettings> options, SignInManager<IdentityUser> signInManager)
         {
             this.userManager = userManager;
             this.context = context;
@@ -219,6 +219,33 @@ namespace Application.Common.Services
             await context.SaveChangesAsync();
 
             return result;
+        }
+
+        //public Task<IdentityResult> UpdateCurrentUserAsync(string userId, UserModel model)
+        //{
+        //    User user = userManager.FindByIdAsync(userId).Result;
+
+        //    if (user == null)
+        //    {
+        //        return Task.FromResult(IdentityResult.Failed(new IdentityError { Description = "User not found." }));
+        //    }
+
+        //    return Task.FromResult(IdentityResult.Success);
+        //}
+
+        public async Task<IdentityResult> DeleteUserAsync(string userId)
+        {
+            User? user = await userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "User not found." });
+            }
+
+            IdentityResult result = await userManager.DeleteAsync(user);
+
+            return result;
+
         }
     }
 }

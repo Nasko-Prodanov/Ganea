@@ -1,4 +1,5 @@
-﻿using Application.Common.Extension;
+﻿using System.Text.Json.Serialization;
+using Application.Common.Extension;
 using Application.Common.Interfaces;
 using Application.Common.Services;
 using GaneaApi.Services;
@@ -36,7 +37,13 @@ public class Program
         builder.Services.AddOptions<JwtSettings>();
         builder.Services.AddInfrstructure(configuration);
         builder.Services.AddApplication();
-        builder.Services.AddControllers();
+        builder.Services.AddControllers()
+            .AddJsonOptions(opts =>
+            {
+                opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                opts.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            });
+
         //builder.Services.AddIdentity();
         builder.Services.AddOpenApiDocument(configure =>
          {

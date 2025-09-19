@@ -21,8 +21,6 @@ namespace Application.Common.Services
     {
         private readonly GaneaDbContext context;
         private readonly UserManager<User> userManager;
-        private readonly RoleManager<IdentityRole> roleManager;
-        private readonly SignInManager<IdentityUser> signInManager;
         private readonly JwtSettings settings;
         private readonly string jwtKey;
 
@@ -32,7 +30,6 @@ namespace Application.Common.Services
             this.context = context;
             jwtKey = Environment.GetEnvironmentVariable("JWT_SECURITY_KEY")!;
             settings = options.Value;
-            this.signInManager = signInManager;
         }
 
         public async Task CreateUserAsync(UserModel model, CancellationToken cancellationToken)

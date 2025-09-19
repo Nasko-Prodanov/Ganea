@@ -8,7 +8,7 @@ namespace Application.Common.Interfaces
 {
     public interface IIdentityService
     {
-        //Task<IdentityResult> UpdateCurrentUserAsync(string userId, UserModel model);
+        Task<IdentityResult> UpdateCurrentUserAsync(string userId, UserModel model);
 
         Task<IdentityResult> DeleteUserAsync(string userId);
 

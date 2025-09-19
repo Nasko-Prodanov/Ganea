@@ -223,17 +223,34 @@ namespace Application.Common.Services
             return result;
         }
 
-        //public Task<IdentityResult> UpdateCurrentUserAsync(string userId, UserModel model)
-        //{
-        //    User user = userManager.FindByIdAsync(userId).Result;
+        public async Task<IdentityResult> UpdateCurrentUserAsync(string userId, UserModel model)
+        {
+            User? user = await context.Users
+                .Where(u => u.Id == userId)
+                .FirstOrDefaultAsync();
 
-        //    if (user == null)
-        //    {
-        //        return Task.FromResult(IdentityResult.Failed(new IdentityError { Description = "User not found." }));
-        //    }
+            if (user is null)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "User not found." });
+            }
 
-        //    return Task.FromResult(IdentityResult.Success);
-        //}
+            Employee? employee = await context.Employees
+                .Where(e => e.UserId == userId)
+                .FirstOrDefaultAsync();
+
+            user.UserName = model.UserName;
+            user.Email = model.Email;
+
+            if (employee is not null)
+            {
+                employee.FirstName = model.FirstName;
+                employee.LastName = model.LastName;
+            }
+
+            await context.SaveChangesAsync();
+
+            return IdentityResult.Success;
+        }
 
         public async Task<IdentityResult> DeleteUserAsync(string userId)
         {

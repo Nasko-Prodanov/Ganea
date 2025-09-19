@@ -15,7 +15,7 @@ namespace GaneaApi.Controllers
         private readonly IIdentityService identityService;
         private readonly ICurrentUserService currentUserService;
 
-        public UsersController(IdentityService identity,ICurrentUserService currentUserService)
+        public UsersController(IdentityService identity, ICurrentUserService currentUserService)
         {
             this.identityService = identity;
             this.currentUserService = currentUserService;
@@ -54,7 +54,7 @@ namespace GaneaApi.Controllers
         public async Task<IActionResult> ResetPassword([FromBody] ChangePasswordDto model, string userId)
         {
             IdentityResult result = await identityService.ResetPasswordAsync(userId, model.NewPassword);
-            
+
             if (!result.Succeeded)
             {
                 return BadRequest(string.Join(", ", result.Errors));
@@ -66,7 +66,7 @@ namespace GaneaApi.Controllers
         [HttpPut("ChangePassword")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto model)
         {
-            IdentityResult result = await identityService.ChangeCurrentUserPasswordAsync(currentUserService.UserId , model.OldPassword, model.NewPassword);
+            IdentityResult result = await identityService.ChangeCurrentUserPasswordAsync(currentUserService.UserId, model.OldPassword, model.NewPassword);
 
             if (!result.Succeeded)
             {
@@ -89,8 +89,8 @@ namespace GaneaApi.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete]
-        public async Task<ActionResult<IdentityResult>> DeleteUser(string userId)
+        [HttpDelete("{id}/DeleteUser")]
+        public async Task<ActionResult<IdentityResult>> DeleteUser([FromRoute]string userId)
         {
             IdentityResult result = await identityService.DeleteUserAsync(userId);
 
@@ -108,6 +108,19 @@ namespace GaneaApi.Controllers
         {
             List<UserDto> users = await identityService.DisplayUsers(search, role);
             return users;
+        }
+
+        [HttpPut("{id}/UpdateUser")]
+        public async Task<ActionResult<IdentityResult>> UpdateUser([FromRoute] string id, [FromBody] UserModel model)
+        {
+            IdentityResult result = await identityService.UpdateCurrentUserAsync(id, model);
+            
+            if (!result.Succeeded)
+            {
+                return BadRequest(string.Join(", ", result.Errors));
+            }
+            
+            return result;
         }
     }
 }

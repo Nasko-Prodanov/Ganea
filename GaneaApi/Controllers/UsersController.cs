@@ -3,8 +3,6 @@ using Application.Common.Models.ChangePassword;
 using Application.Common.Models.User;
 using Application.Common.Services;
 using Infrastructure.Common.Models;
-using Infrastructure.Persistance.Enums;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -86,6 +84,16 @@ namespace GaneaApi.Controllers
                 return BadRequest(string.Join(", ", result.Errors));
             }
             return Ok(result);
+        }
+
+        public async Task<IdentityResult> DeleteUser(string userId)
+        {
+            IdentityResult result = await identity.DeleteUserAsync(userId);
+
+            if (!result.Succeeded) 
+                return BadRequest("");
+
+            return result;
         }
     }
 }

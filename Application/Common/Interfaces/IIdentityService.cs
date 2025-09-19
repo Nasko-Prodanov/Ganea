@@ -8,6 +8,10 @@ namespace Application.Common.Interfaces
 {
     public interface IIdentityService
     {
+        //Task<IdentityResult> UpdateCurrentUserAsync(string userId, UserModel model);
+
+        Task<IdentityResult> DeleteUserAsync(string userId);
+
         Task<IdentityResult> SetUserRoleAsync(string userId, Role newRole);
 
         Task CreateUserAsync(UserModel model, CancellationToken cancellationToken);

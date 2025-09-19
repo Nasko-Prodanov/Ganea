@@ -21,14 +21,12 @@ namespace Application.Common.Services
     {
         private readonly GaneaDbContext context;
         private readonly UserManager<User> userManager;
-        private readonly RoleManager<IdentityRole> roleManager;
         private readonly JwtSettings settings;
         private readonly string jwtKey;
 
         public IdentityService(UserManager<User> userManager, GaneaDbContext context, IOptions<JwtSettings> options)
         {
             this.userManager = userManager;
-            this.roleManager = roleManager;
             this.context = context;
             jwtKey = Environment.GetEnvironmentVariable("JWT_SECURITY_KEY")!;
             settings = options.Value;

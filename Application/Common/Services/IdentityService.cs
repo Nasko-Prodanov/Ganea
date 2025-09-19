@@ -1,4 +1,5 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System.Collections;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -8,6 +9,7 @@ using Application.Common.Validators;
 using Infrastructure.Common.Models;
 using Infrastructure.Persistance;
 using Infrastructure.Persistance.Entities;
+using Infrastructure.Persistance.Enums;
 using Infrastructure.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -19,12 +21,14 @@ namespace Application.Common.Services
     {
         private readonly GaneaDbContext context;
         private readonly UserManager<User> userManager;
+        private readonly RoleManager<IdentityRole> roleManager;
         private readonly JwtSettings settings;
         private readonly string jwtKey;
 
         public IdentityService(UserManager<User> userManager, GaneaDbContext context, IOptions<JwtSettings> options)
         {
             this.userManager = userManager;
+            this.roleManager = roleManager;
             this.context = context;
             jwtKey = Environment.GetEnvironmentVariable("JWT_SECURITY_KEY")!;
             settings = options.Value;
@@ -117,7 +121,7 @@ namespace Application.Common.Services
                 RefreshToken = refreshToken
             };
         }
- 
+
         private string GenerateAccessToken(User user, IEnumerable<Claim> claims, CancellationToken token)
         {
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
@@ -191,6 +195,30 @@ namespace Application.Common.Services
 
 
             IdentityResult result = await userManager.ResetPasswordAsync(user, token, newPassword);
+
+            return result;
+        }
+
+        public async Task<IdentityResult> SetUserRoleAsync(string userId, Role newRole)
+        {
+            User user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "User not found." });
+            }
+
+            IList<string> currentRoles = await userManager.GetRolesAsync(user);
+
+            await userManager.RemoveFromRolesAsync(user, currentRoles);
+
+            IdentityResult result = await userManager.AddToRoleAsync(user, newRole.ToString());
+
+            if (result.Succeeded)
+            {
+                user.Role = newRole;
+            }
+
+            await context.SaveChangesAsync();
 
             return result;
         }

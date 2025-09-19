@@ -3,6 +3,7 @@ using Application.Common.Models.ChangePassword;
 using Application.Common.Models.User;
 using Application.Common.Services;
 using Infrastructure.Common.Models;
+using Infrastructure.Persistance.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -72,6 +73,18 @@ namespace GaneaApi.Controllers
                 return BadRequest(string.Join(", ", result.Errors));
             }
 
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}/SetRole")]
+        public async Task<ActionResult> SetRole([FromRoute] string id, [FromBody] Role role)
+        {
+            IdentityResult result = await identityService.SetUserRoleAsync(id, role);
+            if (!result.Succeeded)
+            {
+                return BadRequest(string.Join(", ", result.Errors));
+            }
             return Ok(result);
         }
     }

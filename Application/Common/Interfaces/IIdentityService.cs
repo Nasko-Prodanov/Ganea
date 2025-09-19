@@ -1,12 +1,17 @@
-﻿using Application.Common.Models.User;
+﻿using System.Collections;
+using Application.Common.Models.User;
 using Infrastructure.Common.Models;
+using Infrastructure.Persistance.Enums;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Common.Interfaces
 {
     public interface IIdentityService
     {
+        Task<IdentityResult> SetUserRoleAsync(string userId, Role newRole);
+
         Task CreateUserAsync(UserModel model, CancellationToken cancellationToken);
+
         Task<AuthResponse> AuthenticateAsync(LoginInputModel model, CancellationToken cancellationToken);
 
         Task<IdentityResult> ChangeCurrentUserPasswordAsync(string userId,string oldPAssword, string newPassword);

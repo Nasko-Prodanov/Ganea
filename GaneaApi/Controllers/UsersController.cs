@@ -101,6 +101,14 @@ namespace GaneaApi.Controllers
 
             return result;
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<ActionResult<List<UserDto>>> DisplayUsers(string? search, string? role)
+        {
+            List<UserDto> users = await identityService.DisplayUsers(search, role);
+            return users;
+        }
     }
 }
 

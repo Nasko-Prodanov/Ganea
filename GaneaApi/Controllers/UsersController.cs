@@ -103,6 +103,13 @@ namespace GaneaApi.Controllers
         }
 
         [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<ActionResult<List<UserDto>>> DisplayUsers(string? search, string? role)
+        {
+            List<UserDto> users = await identityService.DisplayUsers(search, role);
+            return users;
+        }
+
         [HttpPut("{id}/UpdateUser")]
         public async Task<ActionResult<IdentityResult>> UpdateUser([FromRoute] string id, [FromBody] UserModel model)
         {
@@ -115,7 +122,6 @@ namespace GaneaApi.Controllers
             
             return result;
         }
-
     }
 }
 

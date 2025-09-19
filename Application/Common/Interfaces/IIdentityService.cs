@@ -8,7 +8,9 @@ namespace Application.Common.Interfaces
 {
     public interface IIdentityService
     {
+        Task<List<UserDto>> DisplayUsers(string? search, string? role);
         Task<IdentityResult> UpdateCurrentUserAsync(string userId, UserModel model);
+
 
         Task<IdentityResult> DeleteUserAsync(string userId);
 

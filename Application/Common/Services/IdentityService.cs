@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -264,6 +265,46 @@ namespace Application.Common.Services
 
             return result;
 
+        }
+
+        public async Task<List<UserDto>> DisplayUsers(string? search, string? role)
+        {
+
+            IQueryable<UserDto> query = context.Users.Select(
+                u => new UserDto
+                {
+                    Id = u.Id,
+                    Email = u.Email,
+                    UserName = u.UserName,
+                    FirstName = u.Employee != null ? u.Employee.FirstName : string.Empty,
+                    LastName = u.Employee != null ? u.Employee.LastName : string.Empty,
+                    Role = u.Role.ToString()
+                })
+                .AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim()
+                    .ToLower();
+
+                query = query.Where(u =>
+                    u.Email.ToLower().Contains(search) ||
+                    u.UserName.ToLower().Contains(search) ||
+                    u.FirstName.ToLower().Contains(search) ||
+                    u.LastName.ToLower().Contains(search));
+            }
+
+            if (!string.IsNullOrWhiteSpace(role))
+            {
+                role = role.Trim()
+                    .ToLower();
+
+                query = query.Where(u => u.Role.ToLower() == role);
+            }
+
+            List<UserDto> result = await query.ToListAsync();
+
+            return result;
         }
     }
 }
